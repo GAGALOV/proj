@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'figma\css\login.css' %}">
+    <link rel="stylesheet" href="{% static 'figma/css/header.css' %}">
+
+    <title>Вход</title>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <h1>Decode Blog</h1>
+            </div>
+            <div class="header-center">
+                <form method="get" action="{% url 'post_list' %}">
+                    <input type="text" name="search" placeholder="Поиск постов...">
+                    <button type="submit">Искать</button>
+                </form>
+            </div>
+            <div>
+                {% if request.user.is_authenticate %}
+                <a href="">Профиль</a>
+                <a href="">Выйти</a>
+                {% else %}
+                <a href="">Вход</a>
+                <a href="">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <h1>Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Войти</button>
+    </form>
+    <p>Нет аккаунта? <a href="{% url 'signup' %}">Зарегистрироваться</a></p>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'figma/css/add_post.css' %}">
+
+    <title>Добавление нового блога</title>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <h1>Decode Blog</h1>
+            </div>
+            <div class="header-right">
+                <form method="GET" action="{% url 'search' %}">
+                    <input type="text" name="q" placeholder="Поиск по блогам...">
+                    <button type="submit">Искать</button>
+                </form>
+            </div>
+        </div>
+    </header>
+    <h1>Новый блог</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить</button>
+    </form>
+</body>
+</html>
