@@ -16,9 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import settings
+from django.conf.urls.static import static
+from django.conf.urls import url
+from rest_framework_swagger.views import get_swagger_view
 
+
+schema_view = get_swagger_view(title='Blogs API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('figma/', include('figma.urls')),
+    path('blogs/', include('decode_blogs.urls')),
+    path('authe/', include('decode_authe.urls')),
+    url('swagger/', schema_view),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
