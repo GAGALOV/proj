@@ -1,77 +1,211 @@
-from tokenize import Comment
+from typing import Any, Dict
 from django.shortcuts import render, redirect
-from django.views import View
-from .models import Category, Post
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import PostForm
-
-# Create your views here.
-
-
-
-
-def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-    return render(request, 'figma/signup.html', {'form': form})
-
-def signin(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = AuthenticationForm()
-    return render(request, 'figma/login.html', {'form': form}) 
+from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView     
+from rest_framework.viewsets import ModelViewSet  
+from rest_framework.decorators import action 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse, reverse_lazy 
+from django.http import HttpResponse
+from rest_framework.views import APIView     
+from rest_framework.response import Response 
+from django.views.generic import View
+from .permissions import *
+from .models import *
+from .forms import *
+from .serializer import *
+from django.http import Http404
 
 
-def post_list(request):
-    posts = Post.objects.all()
+menu = [
+    {'title':'Home', 'url':'figma:home'},
+    {'title':'Description', 'url':'figma:category'},   # Определение заголовков страницы #
+    {'title':'Регистрация', 'url':'authe:signup'},
+    {'title':'Вход', 'url':'authe:signin'},
+]
+
+def Home(request):
+    data = {
+        'title':'Главная',
+        'menu': menu,
+        'categories': Category.objects.all(),
+        'blogs': Blog.objects.all(),
+    }
+    return render(request, 'figma/home.html',  data)
+
+
+class CategoriesBlog(ListView):
+    model = Blog
+    template_name = 'figma/home.html'
+    context_object_name = 'categories'
+    
+
+    def get_context_data(self, **kwargs):        
+        context = super().get_context_data(**kwargs)
+        
+        # Передача контекстных данных  #
+        context['title'] = 'Категории'
+        context['menu'] = menu
+        context['categories'] = Category.objects.all()
+
+        return context
+    
+def site_category(request, category_id):
+    blogs = Blog.objects.filter(category_id=category_id)
     categories = Category.objects.all()
-    return render(request, 'figma/post_list.html', {'posts': posts, 'categories': categories})
 
-def post_detail(request, pk):
-    post = Post.objects.get(pk=pk)
-    return render(request, 'figma/post_detail.html', {'post': post})
+    data = {
+        'blogs':blogs,
+        'categories':categories,
+        'menu':menu,
+        'title':'Статьи',
+        'category_id':category_id
+    }
 
-def category_list(request):
-    categories = Category.objects.all()
-    return render(request, 'figma/category_list.html', {'categories': categories})
+    return render(request, 'figma/home.html', context=data) 
 
-def add_post(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST,request.FILES)
+
+class AddBlog(CreateView):
+    form_class = BlogForm
+    template_name = 'figma/add_blog.html'
+    success_url = reverse_lazy('figma:home.html')     # Переход после создания блога #
+
+    def get_context_data(self, **kwargs):        
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = 'Новый блог'
+        context['menu'] = menu
+
+        return context
+
+def delete_blog(request, blog_id):           
+    try:
+        blog = Blog.objects.get(pk=blog_id)
+        blog.delete()
+        return redirect('authe:profile')    # Переход после удаления #
+    except Blog.DoesNotExist:
+        return HttpResponse("Blog DoesNotExist") 
+
+class EditBlog(UpdateView):
+    model = Blog
+    form_class = BlogForm
+    template_name = 'figma/redact.html'  
+    success_url = reverse_lazy('figma:home')
+    
+    def get_object(self):
+        blog_id = self.kwargs['blog_id']
+        return Blog.objects.get(pk=blog_id)
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+def profile(request):
+    user = request.user
+    user_blogs = Blog.objects.filter(author=user)
+
+    return render(request, 'profil.html', {'user_blogs': user_blogs})
+
+
+class BlogSearchView(View):
+    template_name = 'figma/home.html'
+
+    def post(self, request):
+        form = BlogSearchForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('post_list') 
-    else:
-        form = PostForm()
-    return render(request, 'figma/add_post.html', {'form': form})
+            search_query = form.cleaned_data['search']    # Получение данных введенных в форму #
+            blogs = Blog.objects.filter(name__icontains=search_query)  # Поиск записей в Blog  #
+            return render(request, 'figma/home.html', {'blogs':blogs, 'query':search_query})
+        return render(request, self.template_name, {'form':form})
+
+class AddComment(LoginRequiredMixin, CreateView):
+    form_class = CommentForm
+    template_name = 'figma/add_comment.html'
+    success_url = reverse_lazy('figma:home')     # Переход после создания продукта #
+    
+    def form_valid(self, form):
+        form.instance.user = self.request.user  # Привязать комментарий к текущему пользователю #
+        blog_id = self.kwargs.get('blog_id')
+
+        if blog_id:                                # Связка комментария с определенным блогом #
+            form.instance.blog_id = blog_id
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):        
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Новый комментарий'
+        context['menu'] = menu
+
+        return context
+    
+def delete_comment(request, blog_id):           
+    try:
+        comment = Comment.objects.get(pk=blog_id)
+        comment.delete()
+        return redirect('figma:home')   
+    except Comment.DoesNotExist:
+        return HttpResponse("Comment DoesNotExist") 
 
 
-def search(request):
-    query = request.GET.get('q') 
+class ShowComment(DetailView):
+    model = Comment                     # Изменено на модель Comment, чтобы отображать комментарии
+    template_name = 'figmas/comentary.html'
+    pk_url_kwarg = 'comment_id'
 
-    if query:
-        results = Post.objects.filter(title__icontains=query) | Post.objects.filter(content__icontains=query)
-    else:
-        results = []
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_authenticated:
+            return queryset.none()
+        return queryset.filter(blog_id=self.blog_id)
 
-    return render(request, 'figma/search_results.html', {'results': results, 'query': query})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Обзор комментариев'
+        context['blog'] = Blog.objects.get(id=self.blog_id)
+        context['menu'] = menu
+        return context
+    
 
-def add_comment(request, post_id):
-    if request.method == 'POST':
-        post = Post.objects.get(pk=post_id)
-        # Создайте новый комментарий и сохраните его
-        comment = Comment(text=request.POST['comment_text'], post=post)
-        comment.save()
-        return redirect('post_detail', post_id=post_id)
+class BlogDetail(DetailView):
+    model = Blog
+    template_name = 'figma/commentary.html'
+    pk_url_kwarg = 'blog_id'
+    context_object_name = 'blog'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Обзор блога'
+        context['comments'] = Comment.objects.filter(blog_id=self.kwargs['blog_id'])  # Комментарии относящиеся к этому блогу #
+        context['categories'] = Category.objects.all()
+        context['menu'] = menu
+        return context
+
+
+                # API #
+
+
+class BlogListAPIView(ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    permission_classes = (IsAdminOrReadOnly,)    # Класс для предоставления  доступа #
+
+
+class BlogDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    permission_classes = (IsOwnerOrReadOnly,) 
+
+
+
+class CommentListAPIView(ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+class CommentDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = (IsAdminOrReadOnly,) 
+

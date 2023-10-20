@@ -1,51 +1,44 @@
 from django.db import models
-from django.shortcuts import render
-from django.urls import reverse
 from django.contrib.auth.models import User
+from django.conf import settings
+import datetime
 import uuid
-
-from django.views import View
-
-
-def uniq_name_upload(instance, filename):
-    new_file_name = f"{uuid.uuid4()}.{filename.split('.')[-1]}"
-    return f'post_images/{new_file_name}'
 
 # Create your models here.
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
+def uniq_name_upload(instance, filename):
+    new_file_name = f"{uuid.uuid4()}.{filename.split('.')[-1]}"
+    return f'images/{new_file_name}'
 
+
+class Category(models.Model):
+    name = models.CharField(max_length=50)
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
     
-
-class Post(models.Model):
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    views_count = models.IntegerField(default=0)
-    comments = models.ManyToManyField('Comment', related_name='post_comments', blank=True)
-    image =  image = models.ImageField(upload_to='post_images/')
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse('post_detail', args=[str(self.id)])
+class Blog(models.Model):
+    name = models.CharField(max_length=50)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
+    image = models.ImageField(blank=True, upload_to=uniq_name_upload)
+    description = models.TextField()
+    date = models.DateTimeField(default=datetime.datetime.today())
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)     # !  1 #
     
+    class Meta:
+        verbose_name = 'Blog'
+        verbose_name_plural = 'Blogs'
 
-class PostDetailView(View):
-    def get(self, request, post_id):
-        post = Post.objects.get(pk=post_id)
-        post.views_count += 1
-        post.save()
-        return render(request, 'post_detail.html', {'post': post})
+    def __str__(self) -> str:
+        return self.name
     
+    
+class Comment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.TextField(max_length=2000)
+    date = models.DateTimeField(default=datetime.datetime.today())
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, default=1)
 
