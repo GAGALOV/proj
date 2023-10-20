@@ -1,18 +1,23 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
-from django.conf import settings
-from django.conf.urls.static import static
+
+app_name = 'decode_blogs'
 
 urlpatterns = [
-    path('post/', views.post_list, name='post_list'),
-    path('post/<int:pk>/', views.post_detail, name='post_detail'),
-    path('categories/', views.category_list, name='category_list'),
-    path('signup/', views.signup, name='signup'),
-    path('login/', views.login, name='login'),
-     path('add_post/', views.add_post, name='add_post'),
-     path('search/', views.search, name='search'),
-     path('posts/', views.PostListView.as_view(), name='posts'),
-]
+    path('', views.Home, name="home"),
+    path('blog/<int:category_id>/', views.site_category, name='category'),
+    path('add/', views.AddBlog.as_view(), name='add'),
+    path('search/', views.BlogSearchView.as_view(), name='search_blog'), 
+    path('delete/<int:blog_id>/', views.delete_blog, name='delete_blog'), 
+    path('redact_blog/<int:blog_id>/', views.EditBlog.as_view(), name='redact'),
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    path('cmadd/', views.AddComment.as_view(), name='cmadd'),
+    path('testcommentview/<int:blog_id>/', views.BlogDetail.as_view(), name='comments-category'),
+    path('delete/<int:blog_id>/', views.delete_comment, name='delete'), 
+
+    
+    path('', include('rest_framework.urls')),
+    path('', views.BlogListAPIView.as_view()),
+    path('<int:pk>/',views.BlogDetailAPIView.as_view()),
+]

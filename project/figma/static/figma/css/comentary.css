@@ -1,0 +1,52 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+.main-3 {
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 500px;
+    height: 200px;
+    margin-left: 100px;
+}
+
+.comment  {
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 100px;
+    border: 3px solid  black;
+}
+
+.comm-detail {
+    display: flex;
+    gap: 20px;
+}
+
+#text {
+    margin-top: 5px;
+}
+
+#button-com, #button-come {
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    width: 150px;
+    height: 40px;
+    border: rgb(69, 69, 247);
+    border-radius: 5px;
+    color: white;
+    background-color: rgb(69, 69, 247)
+}
+
+#com-line {
+    border-color: black;
+    border-width: 1px;
+}

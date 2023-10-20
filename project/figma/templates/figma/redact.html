@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redact blog</title>
+    <link rel="stylesheet" href="{% static 'figma/css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'figma/css/Edit-blog.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Decode Blog</h1>
+        <div class="header-div-1">
+            <form method="POST" action="{% url 'figma:blog-search'  %}" class="form_1">
+                {% csrf_token %}
+                <input type="search" placeholder="Поиск по блогам" name="search">
+                <button id="button-find">
+                    <img src="{% static 'figma/images/search_icon.svg' %}" alt="" id="search_icon">
+                    Search
+                </button>
+            </form> 
+        </div>
+
+                    
+        <div class="header-div-2">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'authe:signout' %}" class="button-reg">Signout</a> 
+                {% if user.image %}
+                    <a href="{% url 'authe:profile'%}"><img src="{{ user.image.url }}" alt="" id="header-img"></a>
+                {% else %}
+                    <a href="{% url 'authe:profile'%}"><img src="{% static 'figma/images/User.png' %}" alt=""></a>
+                {% endif %}
+            {% else %}
+            <a href="{% url 'authe:signin' %}" class="button-reg">SignIn</a>
+            <a href="{% url 'authe:signup' %}" class="button-reg">SignUp</a>
+            {% endif %}
+        </div>
+
+    </header>
+    <hr id="hr-line">
+    {% if request.user.is_authenticated %}
+    <section class="main">
+        <form class="form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" name="author_id" value="{{ user.id }}">
+            <button class="button" type="submit">Сохранить</button>
+    </section>
+    {% endif %}
+
+</body>
+</html>

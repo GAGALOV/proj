@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment</title>
+    <link rel="stylesheet" href="{% static 'figma/css/comments.css' %}">
+    <link rel="stylesheet" href="{% static 'figma/css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'figma/css/Home.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Decode Blog</h1>
+        <div class="header-div-1">
+            <form method="POST" action="{% url 'figma:blog-search'  %}" class="form_1">
+                {% csrf_token %}
+                <input type="search" placeholder="Поиск по блогам" name="search">
+                <button id="button-find">
+                    <img src="{% static 'figma/images/search_icon.svg' %}" alt="" id="search_icon">
+                    Search
+                </button>
+            </form> 
+        </div>
+
+        
+        <div class="header-div-2">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'figma:home' %}" class="button-reg">Home</a>
+                <a href="{% url 'authe:signout' %}" class="button-reg">Signout</a>
+                {% if user.image %}
+                    <a href="{% url 'authe:profile'%}"><img src="{{ user.image.url }}" alt="" id="header-img"></a>
+                {% else %}
+                    <a href="{% url 'authe:profile'%}"><img src="{% static 'figma/images/User.png' %}" alt=""></a>
+                {% endif %}
+
+            {% else %}
+                <a href="{% url 'authe:signin' %}">SignIn</a>
+            {% endif %}
+        </div>
+    </header>
+    <hr>
+
+    <section class="main">
+        <div class="blogs">
+            <div class="com-blog">
+                <div class="main-info"> 
+                    {% if blog.image %}
+                    <img src="{{ blog.image.url }}" alt="comment-img" class="comment-img">
+                    {% endif %}
+                </div>
+                <h2 id="blog-name">{{ blog.name }}</h2>
+                <hr>
+                    <p id="description">{{ blog.description }}</p>
+                    <hr>
+                    <time id="blog-date"><img src="{% static 'figma/images/Calendar.png' %}" alt="">{{ blog.date }}</time>
+                    <a href="{% url 'figma:category' blog.id %}" id="blog-category"><img src="{% static 'figma/images/Categories.png' %}" alt="">{{ blog.category }}</a>
+                    <img src="{% static 'figma/images/User.png' %}" alt="" id="blog-author">{{ blog.author }}
+                    <hr>
+            </div>
+        </div>
+        <div class="categories">
+            <h2 id="categories-name">Категории</h2>
+            {% if category_id == 0 %}
+                <a href="{% url 'figma:home' %}" class="selected-ctgr">Все Блоги</a>
+            {% else %}
+                <a href="{% url 'figma:home' %}">Все Блоги</a>
+            {% endif %}
+
+            {% for ctgr in categories %}
+                {% if category_id == ctgr.id %}
+                    <a href="{% url 'figma:category' ctgr.id %}" class="selected-ctgr">{{ctgr.name}}</a>
+                {% else %}
+                    <a href="{% url 'figma:category' ctgr.id %}">{{ctgr.name}}</a>
+                {% endif %}
+            {% endfor %}    
+    </section>
+
+    <section class="main-3">
+        <div class="comm-details">
+            {% for c in comments %}
+            <div class="comment">
+                <div class="comm-detail">
+                    <p id="user">{{ c.user }};</p> 
+                    <p>{{ c.date }}</p>
+                </div>
+                <p id="text">{{ c.text }}</p>
+                <hr id="com-line">
+                {% if request.user.is_staff %}
+                <a href="{% url 'figma:delete' c.id %}" id="button-com">Удалить комментарий</a>
+                {% endif %}
+            </div>
+        </div>
+            {% endfor %}
+
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'figma:cmadd' %}" id="button-com">Добавить комментарий</a>
+            {% else %}
+                <a href="{% url 'authe:signin' %}" id="button-come">SignIn</a>
+            {% endif %}
+    </section>
+
+</body>
+</html>

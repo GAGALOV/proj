@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль</title>
+    <link rel="stylesheet" href="{% static 'authe/css/authe.css' %}">
+    <link rel="stylesheet" href="{% static 'authe/css/Header.css' %}">
+
+</head>
+<body>
+    <header>
+        <h1>Decode Blog</h1>
+        <div class="header-div-1">
+            <form method="POST" action="{% url 'figma:blog-search'  %}" class="form">
+                {% csrf_token %}
+                <input type="search" placeholder="Поиск по блогам" name="search">
+                <button id="button-find">
+                    <img src="{% static 'figma/images/search_icon.svg' %}" alt="" id="search_icon">
+                    Search
+                </button>
+            </form> 
+        </div>
+
+        
+        
+        <div class="header-div-2">
+            <a href="{% url 'figma:home' %}" class="button-reg">Home</a>
+            <a href="{% url 'authe:signout' %}" class="button-reg">Signout</a>
+            {% if user.image %}
+                <a href="{% url 'authe:profil'%}"><img src="{{ user.image.url }}" alt="" id="header-img"></a>
+            {% else %}
+                <a href="{% url 'authe:profil'%}"><img src="{% static 'figma/images/User.png' %}" alt=""></a>
+            {% endif %}
+        </div>
+    </header>
+    <hr id="hr-line">
+    
+    <section class="main">
+        <div class="com-blog">
+            {% for b in user_blogs %}
+            <div class="main-info"> 
+                {% if b.image %}
+                <img src="{{ b.image.url }}" alt="comment-img" class="comment-img">
+                {% endif %}
+            </div>
+            <h2 id="blog-name">{{ b.name }}</h2>
+            <p id="description">{{ b.description }}</p>
+            <div class="blog-change">
+                <a href="{% url ':edit' b.id  %}" class="blog-button">Изменить блог</a>
+                <a href="{% url ':delete' b.id %}" class="blog-button">Удалить блог</a>
+            </div>
+            <hr>
+            <div class="blog-review">
+                <time id="blog-date"><img src="{% static '/images/Calendar.png' %}" alt="">{{ b.date }}</time>
+                <a href="{% url ':category' b.id %}"><img src="{% static '/images/Categories.png' %}" alt="" id="blog-categories">{{ b.category }}</a>
+                <a href="{% url ':comments-category' b.id %}"><img src="{% static '/images/Comment.png' %}" alt="" id="blog-comment"></a>
+                <img src="{% static '/images/User.png' %}" alt="">{{ b.author }}
+            </div>
+            <hr>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-main">
+        <span>
+            {% if user.image %}
+            <img src="{{ user.image.url }}" alt="" class="profile-img">
+            {% else %}
+                <img src="{% static 'figma/images/User.png' %}" alt=""></a>
+            {% endif %}
+        </span>
+        <div class="profile-info">
+            <p>
+                <span>{{ user.username }}</span>
+            </p>
+
+            <p>
+                <span>{{ user.first_name }}</span>
+            </p>
+
+            <p>
+                <span>{{ user.last_name }}</span>
+            </p>
+
+            <p>
+                <span>{{ user.email }}</span>
+            </p>
+        </div>
+
+        {% if request.user.is_authenticated %}
+            <div class="admin-links">
+                <a href="{% url 'authe:redact_prof' %}" class="blog-button">Редактировать профиль</a>      
+                <a href="{% url 'figma:add' %}" class="blog-button"> Добавить блог</a>
+            </div>
+        {% endif %}
+    </section>
+</body>
+</html>

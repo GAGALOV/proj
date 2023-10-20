@@ -20,6 +20,14 @@ header h1 {
 }
 
 
+.form {
+    display: flex;
+    align-items: center;
+}
+
+.form input {
+    height: 35px;
+}
 
 .form_1 {
     display: flex;

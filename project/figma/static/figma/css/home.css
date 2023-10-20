@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.main {
+    display: flex;
+    padding: 50px 8%;
+    justify-content: space-between;
+    box-sizing: border-box;
+    position: relative;
+    height: 650px;
+}
+
+.main-info {
+    display: block;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.blogs {
+    width: 75%;
+}
+
+#h2-blog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 35px;
+}
+
+#h2-p {
+    margin-top: 20px;
+    font-size: 20px;
+    text-align: center;
+    align-items: center;
+}
+
+.com-blog {
+    display: block;
+    justify-content: left;
+    align-items: left;
+} 
+
+.blog-review {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+    margin-top: 30px;
+}
+
+
+.comment-img {
+    margin-top: 20px;
+    width: 500px;
+    height: 400px;
+}
+
+        /* Категории Блогов */
+.categories {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 20%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 40px;
+    margin-top: 10px;
+}
+
+#categories-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.categories a {
+    text-decoration: none;
+    color: blue;
+    width: 100%;
+    border-bottom:2px solid #a9a9a9 ;
+    font-size: 20px;
+    transition: 2s;
+}
+
+.categories a:hover{
+    border-bottom: 2px solid;
+}
+
+#blogs-comments {
+    display: inline-block;
+    margin-left: 20px;
+}
