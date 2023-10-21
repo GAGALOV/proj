@@ -20,7 +20,7 @@ from django.http import Http404
 
 menu = [
     {'title':'Home', 'url':'figma:home'},
-    {'title':'Description', 'url':'figma:category'},   # Определение заголовков страницы #
+    {'title':'Description', 'url':'figma:category'},   
     {'title':'Регистрация', 'url':'authe:signup'},
     {'title':'Вход', 'url':'authe:signin'},
 ]
@@ -69,7 +69,7 @@ def site_category(request, category_id):
 class AddBlog(CreateView):
     form_class = BlogForm
     template_name = 'figma/add_blog.html'
-    success_url = reverse_lazy('figma:home.html')     # Переход после создания блога #
+    success_url = reverse_lazy('figma:home.html')   
 
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)
@@ -83,7 +83,7 @@ def delete_blog(request, blog_id):
     try:
         blog = Blog.objects.get(pk=blog_id)
         blog.delete()
-        return redirect('authe:profile')    # Переход после удаления #
+        return redirect('authe:profile')    
     except Blog.DoesNotExist:
         return HttpResponse("Blog DoesNotExist") 
 
@@ -114,21 +114,21 @@ class BlogSearchView(View):
     def post(self, request):
         form = BlogSearchForm(request.POST)
         if form.is_valid():
-            search_query = form.cleaned_data['search']    # Получение данных введенных в форму #
-            blogs = Blog.objects.filter(name__icontains=search_query)  # Поиск записей в Blog  #
+            search_query = form.cleaned_data['search']    
+            blogs = Blog.objects.filter(name__icontains=search_query)  
             return render(request, 'figma/home.html', {'blogs':blogs, 'query':search_query})
         return render(request, self.template_name, {'form':form})
 
 class AddComment(LoginRequiredMixin, CreateView):
     form_class = CommentForm
     template_name = 'figma/add_comment.html'
-    success_url = reverse_lazy('figma:home')     # Переход после создания продукта #
+    success_url = reverse_lazy('figma:home')    
     
     def form_valid(self, form):
-        form.instance.user = self.request.user  # Привязать комментарий к текущему пользователю #
+        form.instance.user = self.request.user 
         blog_id = self.kwargs.get('blog_id')
 
-        if blog_id:                                # Связка комментария с определенным блогом #
+        if blog_id:                               
             form.instance.blog_id = blog_id
         return super().form_valid(form)
 
@@ -149,8 +149,8 @@ def delete_comment(request, blog_id):
 
 
 class ShowComment(DetailView):
-    model = Comment                     # Изменено на модель Comment, чтобы отображать комментарии
-    template_name = 'figmas/comentary.html'
+    model = Comment                     
+    template_name = 'figma/comentary.html'
     pk_url_kwarg = 'comment_id'
 
     
@@ -177,19 +177,18 @@ class BlogDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Обзор блога'
-        context['comments'] = Comment.objects.filter(blog_id=self.kwargs['blog_id'])  # Комментарии относящиеся к этому блогу #
+        context['comments'] = Comment.objects.filter(blog_id=self.kwargs['blog_id']) 
         context['categories'] = Category.objects.all()
         context['menu'] = menu
         return context
 
 
-                # API #
-
+               
 
 class BlogListAPIView(ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
-    permission_classes = (IsAdminOrReadOnly,)    # Класс для предоставления  доступа #
+    permission_classes = (IsAdminOrReadOnly,)    
 
 
 class BlogDetailAPIView(RetrieveUpdateDestroyAPIView):

@@ -15,7 +15,7 @@ from rest_framework import mixins
 from .models import *
 from .forms import *
 from .serializers import *
-from decode_blogs.models import Blog
+from figma.models import Blog
 
 # Create your views here.
 menu = [
@@ -28,7 +28,7 @@ menu = [
 class SignUpUser(CreateView):
     form_class = SignUpUserForm
     template_name = 'authe/signup.html'
-    success_url = reverse_lazy('figma:home')     # Переход после создания пользователя #
+    success_url = reverse_lazy('figma:home')     
 
     def get_context_data(self, **kwargs):        
         context = super().get_context_data(**kwargs)
@@ -77,7 +77,7 @@ class UserViewSet(GenericViewSet, mixins.CreateModelMixin,):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-def signout_user(request):             # Выход из аккаунта  #
+def signout_user(request):             
     logout(request)   
     return redirect('authe:signin')     
 
@@ -90,15 +90,15 @@ def profile(request):
     data = {
         'title': 'Профиль',
         'menu': menu,
-        'user_blogs': user_blogs,   # Передаем отфильтрованные блоги
+        'user_blogs': user_blogs,   
     }
     return render(request, 'authe/profile.html', context=data)
 
 
-@login_required             # Только зарегистрированные user-ы #
+@login_required            
 def edit_profile(request):
     if request.method == 'POST':
-        form = EditProfileForm(request.POST, request.FILES, instance=request.user) # использование данных user-a для редактирования #
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user) 
         if form.is_valid():
             form.save()
             return redirect('authe:profile')  

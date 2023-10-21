@@ -26,8 +26,8 @@ schema_view = get_swagger_view(title='Blogs API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('blogs/', include('decode_blogs.urls')),
-    path('authe/', include('decode_authe.urls')),
+    path('blogs/', include('figma.urls')),
+    path('authe/', include('authe.urls')),
     url('swagger/', schema_view),
 ]
 

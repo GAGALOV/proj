@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
     <link rel="stylesheet" href="{% static ' authe/css/header.css' %}">
-    <link rel="stylesheet" href="{% static ' authe/css/authe.css' %}">
+    <link rel="stylesheet" href="{% static ' authe/css/Authe.css' %}">
 
 </head>
 <body>
@@ -25,7 +25,7 @@
 
     
         <div class="header-div-2">
-            <a href="{% url ' authe:signin' %}" class="button-reg">SignIn</a>
+            <a href="{% url 'authe:signin' %}" class="button-reg">SignIn</a>
             <a href="{% url 'figma:home' %}" class="button-reg">Home</a>
         </div>
     </header>

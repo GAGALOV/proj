@@ -1,14 +1,14 @@
 from django.urls import path, include
 from . import views
 
-app_name = 'decode_blogs'
+app_name = 'figma'
 
 urlpatterns = [
     path('', views.Home, name="home"),
     path('blog/<int:category_id>/', views.site_category, name='category'),
     path('add/', views.AddBlog.as_view(), name='add'),
-    path('search/', views.BlogSearchView.as_view(), name='search_blog'), 
-    path('delete/<int:blog_id>/', views.delete_blog, name='delete_blog'), 
+    path('search/', views.BlogSearchView.as_view(), name='blog-search'), 
+    path('delete/<int:blog_id>/', views.delete_blog, name='delete'), 
     path('redact_blog/<int:blog_id>/', views.EditBlog.as_view(), name='redact'),
 
 

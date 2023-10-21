@@ -10,10 +10,10 @@ class BlogForm(forms.ModelForm):
             'description':forms.Textarea(attrs={'rows':5})
         }
         
-    def save(self, commit):
+    def sav(self, commit):
         author = settings.AUTH_USER_MODEL.objects.get(id=self.data['author_id'])
         self.instance.author = author
-        return super().save(commit)
+        return super().save()
 
 
 class CommentForm(forms.ModelForm):

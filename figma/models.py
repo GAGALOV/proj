@@ -26,7 +26,7 @@ class Blog(models.Model):
     image = models.ImageField(blank=True, upload_to=uniq_name_upload)
     description = models.TextField()
     date = models.DateTimeField(default=datetime.datetime.today())
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)     # !  1 #
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)    
     
     class Meta:
         verbose_name = 'Blog'
