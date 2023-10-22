@@ -5,6 +5,7 @@ app_name = 'figma'
 
 urlpatterns = [
     path('', views.Home, name="home"),
+    path('home/', views.Home, name='home.html'),
     path('blog/<int:category_id>/', views.site_category, name='category'),
     path('add/', views.AddBlog.as_view(), name='add'),
     path('search/', views.BlogSearchView.as_view(), name='blog-search'), 

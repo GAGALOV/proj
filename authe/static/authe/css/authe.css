@@ -116,8 +116,8 @@
 .authe-form button {
     padding: 5px;
     box-sizing: border-box;
-    color: yellow;
-    border: 5px solid yellow;
+    color: rgb(23, 23,218);
+    border: 5px solid rgb(23, 23, 218);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
@@ -203,8 +203,8 @@
 .profile-form button {
     padding: 5px;
     box-sizing: border-box;
-    color: yellow;
-    border: 5px solid yellow;
+    color: rgb(23, 23, 218);
+    border: 5px solid rgb(23, 23,218);
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
